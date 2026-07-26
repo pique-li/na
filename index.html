@@ -155,7 +155,7 @@ button{ font:inherit; color:inherit; border:0; background:none; cursor:pointer; 
 /* ---------- メインの写真 ---------- */
 .photo{
   position:relative;
-  height:clamp(190px, 40vh, 400px);   /* ビューポートの高さに応じて写真エリアを縮める */
+  height:clamp(220px, 46vh, 460px);   /* ビューポートの高さに応じて写真エリアを調整 */
   width:100%;
   border-radius:var(--radius-md); overflow:hidden;
   background:linear-gradient(160deg,#dcefff,#b9dcf6);
@@ -163,7 +163,8 @@ button{ font:inherit; color:inherit; border:0; background:none; cursor:pointer; 
 }
 .photo img{
   position:absolute; inset:0; width:100%; height:100%;
-  object-fit:cover; opacity:0;
+  object-fit:contain;   /* 写真の縦横比を保ったまま全景が見えるように */
+  opacity:0;
   transition:opacity .7s var(--ease), transform 8s linear;
 }
 .photo img.is-active{ opacity:1; }
@@ -201,11 +202,13 @@ button{ font:inherit; color:inherit; border:0; background:none; cursor:pointer; 
 
 /* ---------- サムネイル ---------- */
 .thumbs{
-  margin-top:10px; display:flex; gap:clamp(8px,1vw,16px);
+  margin-top:10px; display:flex; gap:clamp(8px,1vw,14px);
+  overflow-x:auto; padding-bottom:4px; scrollbar-width:none;
 }
+.thumbs::-webkit-scrollbar{ display:none; }
 .thumb{
-  flex:1 1 0; min-width:0; position:relative;
-  aspect-ratio:3/4; border-radius:var(--radius-sm); overflow:hidden;
+  flex:0 0 clamp(58px, 8vw, 84px); position:relative;
+  aspect-ratio:1/1; border-radius:calc(var(--radius-sm) - 4px); overflow:hidden;
   background:linear-gradient(160deg,#e6f4ff,#c6e2f7);
   box-shadow:0 6px 16px -10px rgba(70,130,180,.6);
   transition:transform .35s var(--ease), box-shadow .35s var(--ease);
@@ -229,24 +232,22 @@ button{ font:inherit; color:inherit; border:0; background:none; cursor:pointer; 
   animation:rise 1s .12s var(--ease) both;
   min-height:100%;
 }
+.side-top{ flex-shrink:0; }
 .side h1{
   margin:0; font-family:"Cormorant Garamond",serif; font-weight:400;
   font-size:clamp(52px,5.4vw,84px); line-height:1; letter-spacing:.02em;
   color:var(--blue-deep);
   text-shadow:0 6px 24px rgba(255,255,255,.9);
-  flex-shrink:0;
 }
 .side .jp{
   margin:14px 0 0; font-family:"Zen Maru Gothic",sans-serif;
   font-size:14px; letter-spacing:.42em; text-indent:.42em; color:var(--text-soft);
-  flex-shrink:0;
 }
-.ornament{ margin:26px auto 24px; width:min(240px,80%); display:block; color:var(--blue-pastel); flex-shrink:0; }
+.ornament{ margin:26px auto 24px; width:min(240px,80%); display:block; color:var(--blue-pastel); }
 .side p{
   margin:0 auto; max-width:34ch;
   font-family:"Zen Maru Gothic",sans-serif;
   font-size:14px; line-height:2.3; letter-spacing:.06em; color:var(--text);
-  flex-shrink:0;
 }
 
 /* マスコット（右下の雲の妖精・画像は images/fairies.png に置いてください） */
@@ -316,9 +317,17 @@ button{ font:inherit; color:inherit; border:0; background:none; cursor:pointer; 
 .admin-panel.is-open{ opacity:1; transform:none; pointer-events:auto; }
 
 .admin-panel h2{
-  margin:0 0 4px; font-family:"Cormorant Garamond",serif; font-weight:500;
+  margin:0; font-family:"Cormorant Garamond",serif; font-weight:500;
   font-size:22px; color:var(--blue-deep);
 }
+.admin-head{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.admin-close{
+  flex:none; width:26px; height:26px; display:grid; place-items:center;
+  border-radius:50%; color:var(--text-soft);
+  transition:background .3s var(--ease), color .3s var(--ease);
+}
+.admin-close:hover{ background:rgba(0,0,0,.06); color:var(--blue-deep); }
+.admin-close svg{ width:14px; height:14px; }
 .admin-panel .admin-sub{ margin:0 0 14px; font-size:11px; letter-spacing:.06em; color:var(--text-soft); }
 
 .admin-field{ margin-bottom:12px; }
@@ -376,9 +385,7 @@ button{ font:inherit; color:inherit; border:0; background:none; cursor:pointer; 
   .nav{ order:3; width:100%; margin:0; justify-content:space-between; overflow-x:auto; padding-bottom:4px; }
   .nav a{ white-space:nowrap; font-size:12px; letter-spacing:.1em; }
   :root{ --radius-lg:30px; --radius-md:20px; }
-  .thumbs{ overflow-x:auto; padding-bottom:6px; scrollbar-width:none; }
-  .thumbs::-webkit-scrollbar{ display:none; }
-  .thumb{ flex:0 0 78px; }
+  .thumb{ flex-basis:64px; }
   .arrow{ width:38px; height:38px; margin-top:-19px; }
 }
 @media (prefers-reduced-motion:reduce){
@@ -430,20 +437,22 @@ button{ font:inherit; color:inherit; border:0; background:none; cursor:pointer; 
 
   <!-- 右：タイトルと説明 -->
   <aside class="side">
-    <h1>Gallery</h1>
-    <p class="jp">ギャラリー</p>
+    <div class="side-top">
+      <h1>Gallery</h1>
+      <p class="jp">ギャラリー</p>
 
-    <svg class="ornament" viewBox="0 0 240 24" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true">
-      <path d="M4 12h86M150 12h86" stroke-linecap="round"/>
-      <path d="M96 12c3-4 7-4 8 0M136 12c-3-4-7-4-8 0" stroke-linecap="round"/>
-      <path d="M108 15h20a4 4 0 0 0 .6-7.9 5.4 5.4 0 0 0-10.2-.7A4 4 0 0 0 108 15Z" fill="currentColor" stroke="none" opacity=".85"/>
-    </svg>
+      <svg class="ornament" viewBox="0 0 240 24" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true">
+        <path d="M4 12h86M150 12h86" stroke-linecap="round"/>
+        <path d="M96 12c3-4 7-4 8 0M136 12c-3-4-7-4-8 0" stroke-linecap="round"/>
+        <path d="M108 15h20a4 4 0 0 0 .6-7.9 5.4 5.4 0 0 0-10.2-.7A4 4 0 0 0 108 15Z" fill="currentColor" stroke="none" opacity=".85"/>
+      </svg>
 
-    <!-- ▼ この説明文はご自由に書き換えてください ▼ -->
-    <p id="lead">
-      旅した世界の景色
-    </p>
-    <!-- ▲ ここまで ▲ -->
+      <!-- ▼ この説明文はご自由に書き換えてください ▼ -->
+      <p id="lead">
+        旅した世界の景色
+      </p>
+      <!-- ▲ ここまで ▲ -->
+    </div>
 
     <img class="fairies" src="images/fairies.png" alt="雲の妖精たち" onerror="this.style.display='none'">
   </aside>
@@ -475,7 +484,12 @@ button{ font:inherit; color:inherit; border:0; background:none; cursor:pointer; 
 </button>
 
 <div class="admin-panel" id="adminPanel">
-  <h2>写真を追加</h2>
+  <div class="admin-head">
+    <h2>写真を追加</h2>
+    <button type="button" class="admin-close" id="adminClose" aria-label="閉じる">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+  </div>
   <p class="admin-sub">パスワードを入力して画像をアップロードします</p>
 
   <form id="uploadForm">
@@ -626,20 +640,22 @@ photoBox.addEventListener("touchend", e => {
   touchX = null;
 }, {passive:true});
 
-/* 右エリアの区切り線（ー☁ー）を、＜＞ボタンと同じ高さに合わせます */
-const sideEl = document.querySelector(".side");
+/* 右エリアの区切り線（ー☁ー）を、＜＞ボタンと同じ高さに合わせます
+   （テキスト部分だけをずらし、妖精の位置には影響させません） */
+const sideTopEl = document.querySelector(".side-top");
 const ornamentEl = document.querySelector(".ornament");
 
 function alignOrnament(){
   if (window.matchMedia("(max-width:1080px)").matches){
-    sideEl.style.marginTop = "";
+    sideTopEl.style.marginTop = "";
     return;
   }
-  sideEl.style.marginTop = "0px";
+  sideTopEl.style.marginTop = "0px";
   const p = photoBox.getBoundingClientRect();
   const o = ornamentEl.getBoundingClientRect();
   const gap = (p.top + p.height / 2) - (o.top + o.height / 2);
-  sideEl.style.marginTop = Math.max(gap, -24) + "px";
+  /* 小さな微調整のみに留め、大きくずれても影響を最小限にします */
+  sideTopEl.style.marginTop = Math.max(-12, Math.min(gap, 32)) + "px";
 }
 
 window.addEventListener("resize", alignOrnament);
@@ -689,6 +705,7 @@ async function loadPhotos(){
 /* ============ 管理パネル ============ */
 const adminToggle = document.getElementById("adminToggle");
 const adminPanel  = document.getElementById("adminPanel");
+const adminClose  = document.getElementById("adminClose");
 const uploadForm  = document.getElementById("uploadForm");
 const uploadBtn   = document.getElementById("uploadBtn");
 const uploadMsg   = document.getElementById("uploadMsg");
@@ -700,10 +717,33 @@ const adminRowsEl = document.getElementById("adminRows");
 const savedPw = sessionStorage.getItem("kogumo-admin-pw");
 if (savedPw) pwField.value = savedPw;
 
+function openAdminPanel(){
+  adminPanel.classList.add("is-open");
+  adminToggle.setAttribute("aria-expanded", "true");
+  refreshAdminList();
+}
+function closeAdminPanel(){
+  adminPanel.classList.remove("is-open");
+  adminToggle.setAttribute("aria-expanded", "false");
+}
+
 adminToggle.addEventListener("click", () => {
-  const open = adminPanel.classList.toggle("is-open");
-  adminToggle.setAttribute("aria-expanded", open ? "true" : "false");
-  if (open) refreshAdminList();
+  if (adminPanel.classList.contains("is-open")) closeAdminPanel();
+  else openAdminPanel();
+});
+
+adminClose.addEventListener("click", closeAdminPanel);
+
+/* パネルの外側をクリックしたら閉じます */
+document.addEventListener("click", (e) => {
+  if (!adminPanel.classList.contains("is-open")) return;
+  if (adminPanel.contains(e.target) || adminToggle.contains(e.target)) return;
+  closeAdminPanel();
+});
+
+/* Escキーでも閉じられるようにします */
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && adminPanel.classList.contains("is-open")) closeAdminPanel();
 });
 
 function setMsg(text, type){
